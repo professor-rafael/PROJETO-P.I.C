@@ -30,6 +30,84 @@ document.addEventListener('DOMContentLoaded', function() {
     btnSortear.addEventListener('click', sortear);
     btnReiniciar.addEventListener('click', reiniciar);
     
+    // Função para processar os nomes de forma inteligente
+    function processarNomes(texto) {
+        // Remove espaços extras no início e fim
+        let textoLimpo = texto.trim();
+        
+        // Se estiver vazio, retorna array vazio
+        if (textoLimpo === '') return [];
+        
+        // Verifica se há vírgulas
+        if (textoLimpo.includes(',')) {
+            // Se tiver vírgula, separa por vírgula
+            return textoLimpo.split(',')
+                .map(nome => nome.trim())
+                .filter(nome => nome !== '');
+        } else {
+            // Se não tiver vírgula, tenta separar por espaço ou quebra de linha
+            // Primeiro tenta por quebra de linha
+            if (textoLimpo.includes('\n')) {
+                return textoLimpo.split('\n')
+                    .map(nome => nome.trim())
+                    .filter(nome => nome !== '');
+            } else {
+                // Se não tiver quebra de linha, separa por espaço
+                // Mas verifica se são nomes completos (com mais de uma palavra)
+                const nomesSeparados = textoLimpo.split(' ')
+                    .map(nome => nome.trim())
+                    .filter(nome => nome !== '');
+                
+                // Se tiver apenas um nome ou nomes com 1-2 palavras, mantém como está
+                // Se tiver muitos nomes curtos, pode ser que seja uma lista sem vírgula
+                if (nomesSeparados.length === 1) {
+                    return nomesSeparados;
+                } else {
+                    // Tenta identificar se são nomes completos
+                    // Verifica se há nomes com pelo menos 2 letras e espaços internos
+                    const nomesCompletos = [];
+                    let nomeAtual = '';
+                    
+                    for (let i = 0; i < nomesSeparados.length; i++) {
+                        const palavra = nomesSeparados[i];
+                        
+                        // Se a palavra tem mais de 2 caracteres e não é um artigo/proposição comum
+                        if (palavra.length > 2 && !['de','da','do','das','dos','e','ou','com','em','para','por'].includes(palavra.toLowerCase())) {
+                            if (nomeAtual !== '') {
+                                nomesCompletos.push(nomeAtual.trim());
+                                nomeAtual = '';
+                            }
+                            // Começa um novo nome
+                            nomeAtual = palavra;
+                        } else {
+                            // Adiciona ao nome atual (parte de um nome composto)
+                            if (nomeAtual !== '') {
+                                nomeAtual += ' ' + palavra;
+                            } else {
+                                // Se não tem nome atual, pode ser um nome curto
+                                if (palavra.length > 1) {
+                                    nomesCompletos.push(palavra);
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Adiciona o último nome
+                    if (nomeAtual !== '') {
+                        nomesCompletos.push(nomeAtual.trim());
+                    }
+                    
+                    // Se não conseguiu identificar nomes completos, volta para a separação por espaço
+                    if (nomesCompletos.length === 0) {
+                        return nomesSeparados;
+                    }
+                    
+                    return nomesCompletos;
+                }
+            }
+        }
+    }
+    
     function sortear() {
         // Obter valores
         const quantidade = parseInt(quantidadeInput.value);
@@ -48,9 +126,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            todosNomesInseridos = nomesTexto.split(',')
-                .map(nome => nome.trim())
-                .filter(nome => nome !== '');
+            // Processa os nomes usando a nova função
+            todosNomesInseridos = processarNomes(nomesTexto);
                 
             if (todosNomesInseridos.length === 0) {
                 mostrarErro("Nenhum nome válido foi inserido!");
