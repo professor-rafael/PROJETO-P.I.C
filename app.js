@@ -108,6 +108,83 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // FUNÇÃO PARA EXPLOSÃO DE CONFETI
+    function lancarConfetti() {
+        // Confete principal - mais intenso
+        confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#4361ee', '#3a0ca3', '#f72585', '#00f7ff', '#ff00e4', '#ffd700', '#ff6b6b', '#51cf66']
+        });
+        
+        // Segunda onda de confete após 0.3 segundos
+        setTimeout(() => {
+            confetti({
+                particleCount: 100,
+                spread: 50,
+                origin: { y: 0.5, x: 0.3 },
+                colors: ['#4361ee', '#f72585', '#ffd700', '#00f7ff']
+            });
+        }, 300);
+        
+        // Terceira onda de confete após 0.6 segundos
+        setTimeout(() => {
+            confetti({
+                particleCount: 100,
+                spread: 50,
+                origin: { y: 0.5, x: 0.7 },
+                colors: ['#3a0ca3', '#ff00e4', '#ff6b6b', '#51cf66']
+            });
+        }, 600);
+        
+        // Pequenos confetes caindo por mais tempo (efeito cascata)
+        setTimeout(() => {
+            confetti({
+                particleCount: 80,
+                spread: 30,
+                origin: { y: 0.7 },
+                startVelocity: 30
+            });
+        }, 1000);
+    }
+    
+    // FUNÇÃO PARA EFEITO DE CONFETI EM FORMA DE ESTRELAS
+    function lancarConfettiEstrelas() {
+        // Confete em forma de estrelas (são círculos, mas parecem estrelas caindo)
+        const duration = 15 * 1000;
+        const animationEnd = Date.now() + duration;
+        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+        
+        function randomInRange(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+        
+        const interval = setInterval(function() {
+            const timeLeft = animationEnd - Date.now();
+            
+            if (timeLeft <= 0) {
+                return clearInterval(interval);
+            }
+            
+            const particleCount = 30 * (timeLeft / duration);
+            
+            // Confete em forma de estrela (efeito especial)
+            confetti({
+                ...defaults,
+                particleCount,
+                origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+                colors: ['#ffd700', '#4361ee', '#f72585', '#00f7ff', '#ff00e4']
+            });
+            confetti({
+                ...defaults,
+                particleCount,
+                origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+                colors: ['#ff6b6b', '#51cf66', '#ffd700', '#4361ee', '#f72585']
+            });
+        }, 250);
+    }
+    
     function sortear() {
         // Obter valores
         const quantidade = parseInt(quantidadeInput.value);
@@ -158,6 +235,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // Exibir resultados
         exibirResultados(sorteados);
         
+        // DISPARAR EFEITO DE CONFETI
+        lancarConfetti();
+        lancarConfettiEstrelas();
+        
         // Limpar campo se foi a primeira rodada
         if (nomesDisponiveis.length === todosNomesInseridos.length - sorteados.length) {
             nomesInput.value = '';
@@ -173,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="sorteado-container">
                 <span class="texto__paragrafo">Nomes sorteados:</span>
                 ${sorteados.map(nome => `
-                    <div class="sorteado-destaque">${nome}</div>
+                    <div class="sorteado-destaque confetti-effect">${nome}</div>
                 `).join('')}
             </div>
         `;
@@ -205,6 +286,11 @@ document.addEventListener('DOMContentLoaded', function() {
         todosNomesInseridos = [];
         
         btnReiniciar.classList.add('disabled');
+        
+        // Limpar qualquer confete ativo
+        if (typeof confetti !== 'undefined') {
+            confetti.reset();
+        }
     }
     
     function mostrarErro(mensagem) {

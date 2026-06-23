@@ -444,3 +444,97 @@ body {
         right: 10px;
     }
 }
+
+/* Adicione ao final do seu arquivo style.css */
+
+.sorteado-destaque {
+    font-size: 4.9rem;
+    font-weight: bold;
+    color: var(--primary);
+    animation: float 3s ease-in-out infinite;
+    text-align: center;
+    padding: 8px 0;
+    text-shadow: var(--neon-glow);
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+/* Efeito de brilho no nome sorteado */
+.sorteado-destaque.confetti-effect {
+    animation: float 3s ease-in-out infinite, glowPulse 1.5s ease-in-out infinite;
+    background: linear-gradient(45deg, var(--primary), var(--secondary), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    position: relative;
+}
+
+/* Efeito de brilho pulsante */
+@keyframes glowPulse {
+    0%, 100% {
+        filter: drop-shadow(0 0 10px rgba(67, 97, 238, 0.5));
+        transform: scale(1);
+    }
+    50% {
+        filter: drop-shadow(0 0 30px rgba(247, 37, 133, 0.8)) drop-shadow(0 0 60px rgba(67, 97, 238, 0.4));
+        transform: scale(1.05);
+    }
+}
+
+/* Pequenas partículas em volta do nome */
+.sorteado-destaque::before,
+.sorteado-destaque::after {
+    content: '✨';
+    position: absolute;
+    font-size: 2rem;
+    animation: sparkle 2s ease-in-out infinite;
+}
+
+.sorteado-destaque::before {
+    left: -40px;
+    top: -20px;
+    animation-delay: 0.5s;
+}
+
+.sorteado-destaque::after {
+    right: -40px;
+    bottom: -20px;
+    animation-delay: 1s;
+}
+
+@keyframes sparkle {
+    0%, 100% {
+        opacity: 0;
+        transform: scale(0.5) rotate(0deg);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.2) rotate(180deg);
+    }
+}
+
+/* Responsividade para os efeitos */
+@media (max-width: 768px) {
+    .sorteado-destaque::before,
+    .sorteado-destaque::after {
+        font-size: 1.5rem;
+    }
+    
+    .sorteado-destaque::before {
+        left: -30px;
+        top: -15px;
+    }
+    
+    .sorteado-destaque::after {
+        right: -30px;
+        bottom: -15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .sorteado-destaque::before,
+    .sorteado-destaque::after {
+        display: none;
+    }
+}
